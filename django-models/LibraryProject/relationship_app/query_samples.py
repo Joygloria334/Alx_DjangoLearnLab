@@ -1,0 +1,48 @@
+# relationship_app/query_samples.py
+
+import os
+import sys
+import django
+
+# Add the project root (where manage.py is) to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Configure Django settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
+
+# Setup Django
+django.setup()
+
+# Now import models
+from relationship_app.models import Author, Book, Library, Librarian
+
+
+def get_books_by_author(author_name):
+    try:
+        author = Author.objects.get(name=author_name)
+        return list(author.book_set.all())
+    except Author.DoesNotExist:
+        return []
+
+
+def get_books_in_library(library_name):
+    try:
+        library = Library.objects.get(name=library_name)
+        return list(library.books.all())
+    except Library.DoesNotExist:
+        return []
+
+
+def get_librarian_for_library(library_name):
+    try:
+        library = Library.objects.get(name=library_name)
+        return library.librarian
+    except (Library.DoesNotExist, Librarian.DoesNotExist):
+        return None
+
+
+if __name__ == "__main__":
+    print("Books by George Orwell:", [b.title for b in get_books_by_author("George Orwell")])
+    print("Books in 'Central Library':", [b.title for b in get_books_in_library("Central Library")])
+    librarian = get_librarian_for_library("Central Library")
+    print("Librarian:", librarian.name if librarian else "None")
