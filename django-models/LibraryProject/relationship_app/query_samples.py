@@ -1,28 +1,16 @@
-# relationship_app/query_samples.py
-
 import os
 import sys
 import django
 
-# Add the project root (where manage.py is) to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Configure Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
-
-# Setup Django
 django.setup()
 
-# Now import models
 from relationship_app.models import Author, Book, Library, Librarian
 
 
 def get_books_by_author(author_name):
-    try:
-        author = Author.objects.get(name=author_name)
-        return list(author.book_set.all())
-    except Author.DoesNotExist:
-        return []
+    return list(Book.objects.filter(author__name=author_name))
 
 
 def get_books_in_library(library_name):
@@ -35,9 +23,8 @@ def get_books_in_library(library_name):
 
 def get_librarian_for_library(library_name):
     try:
-        library = Library.objects.get(name=library_name)
-        return library.librarian
-    except (Library.DoesNotExist, Librarian.DoesNotExist):
+        return Librarian.objects.get(library__name=library_name)
+    except Librarian.DoesNotExist:
         return None
 
 
