@@ -59,11 +59,12 @@ def is_member(user):
     return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
 
-# Role-based views
+# Role-based views with @user_passes_test decorator
 @user_passes_test(is_admin, login_url='/login/')
 def admin_view(request):
     """
-    View accessible only to users with Admin role.
+    Admin view - accessible only to users with the 'Admin' role.
+    Uses @user_passes_test decorator to check user's role.
     """
     context = {
         'user': request.user,
@@ -75,7 +76,8 @@ def admin_view(request):
 @user_passes_test(is_librarian, login_url='/login/')
 def librarian_view(request):
     """
-    View accessible only to users with Librarian role.
+    Librarian view - accessible only to users identified as 'Librarians'.
+    Uses @user_passes_test decorator to check user's role.
     """
     context = {
         'user': request.user,
@@ -87,7 +89,8 @@ def librarian_view(request):
 @user_passes_test(is_member, login_url='/login/')
 def member_view(request):
     """
-    View accessible only to users with Member role.
+    Member view - accessible only to users with the 'Member' role.
+    Uses @user_passes_test decorator to check user's role.
     """
     context = {
         'user': request.user,
