@@ -27,8 +27,8 @@ def register_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Log the user in after registration
-            return redirect('list_books')  # Redirect to books list after registration
+            login(request, user)
+            return redirect('list_books')
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
@@ -43,57 +43,32 @@ class CustomLogoutView(LogoutView):
     template_name = 'relationship_app/logout.html'
 
 
-# Helper functions to check user roles
+# Role checking functions
 def is_admin(user):
-    """Check if user has Admin role"""
-    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
 
 
 def is_librarian(user):
-    """Check if user has Librarian role"""
-    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
 
 
 def is_member(user):
-    """Check if user has Member role"""
-    return user.is_authenticated and hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
 
-# Role-based views with @user_passes_test decorator
-@user_passes_test(is_admin, login_url='/login/')
+# Admin view
+@user_passes_test(is_admin)
 def admin_view(request):
-    """
-    Admin view - accessible only to users with the 'Admin' role.
-    Uses @user_passes_test decorator to check user's role.
-    """
-    context = {
-        'user': request.user,
-        'role': request.user.userprofile.role
-    }
-    return render(request, 'relationship_app/admin_view.html', context)
+    return render(request, 'relationship_app/admin_view.html', {'user': request.user})
 
 
-@user_passes_test(is_librarian, login_url='/login/')
+# Librarian view
+@user_passes_test(is_librarian)
 def librarian_view(request):
-    """
-    Librarian view - accessible only to users identified as 'Librarians'.
-    Uses @user_passes_test decorator to check user's role.
-    """
-    context = {
-        'user': request.user,
-        'role': request.user.userprofile.role
-    }
-    return render(request, 'relationship_app/librarian_view.html', context)
+    return render(request, 'relationship_app/librarian_view.html', {'user': request.user})
 
 
-@user_passes_test(is_member, login_url='/login/')
+# Member view
+@user_passes_test(is_member)
 def member_view(request):
-    """
-    Member view - accessible only to users with the 'Member' role.
-    Uses @user_passes_test decorator to check user's role.
-    """
-    context = {
-        'user': request.user,
-        'role': request.user.userprofile.role
-    }
-    return render(request, 'relationship_app/member_view.html', context)
+    return render(request, 'relationship_app/member_view.html', {'user': request.user})
